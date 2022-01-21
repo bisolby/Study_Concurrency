@@ -16,6 +16,7 @@
 		1B7BFF21279AABCA007E65AE /* ConcurrencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B7BFF20279AABCA007E65AE /* ConcurrencyTests.swift */; };
 		1B7BFF2B279AABCA007E65AE /* ConcurrencyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B7BFF2A279AABCA007E65AE /* ConcurrencyUITests.swift */; };
 		1B7BFF2D279AABCA007E65AE /* ConcurrencyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B7BFF2C279AABCA007E65AE /* ConcurrencyUITestsLaunchTests.swift */; };
+		1B7BFF3A279AAF15007E65AE /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B7BFF39279AAF15007E65AE /* Models.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		1B7BFF26279AABCA007E65AE /* ConcurrencyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConcurrencyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B7BFF2A279AABCA007E65AE /* ConcurrencyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrencyUITests.swift; sourceTree = "<group>"; };
 		1B7BFF2C279AABCA007E65AE /* ConcurrencyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrencyUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		1B7BFF39279AAF15007E65AE /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 				1B7BFF09279AABC8007E65AE /* AppDelegate.swift */,
 				1B7BFF0B279AABC8007E65AE /* SceneDelegate.swift */,
 				1B7BFF0D279AABC8007E65AE /* ViewController.swift */,
+				1B7BFF39279AAF15007E65AE /* Models.swift */,
 				1B7BFF0F279AABC8007E65AE /* Main.storyboard */,
 				1B7BFF12279AABCA007E65AE /* Assets.xcassets */,
 				1B7BFF14279AABCA007E65AE /* LaunchScreen.storyboard */,
@@ -260,6 +263,7 @@
 			files = (
 				1B7BFF0E279AABC8007E65AE /* ViewController.swift in Sources */,
 				1B7BFF0A279AABC8007E65AE /* AppDelegate.swift in Sources */,
+				1B7BFF3A279AAF15007E65AE /* Models.swift in Sources */,
 				1B7BFF0C279AABC8007E65AE /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
