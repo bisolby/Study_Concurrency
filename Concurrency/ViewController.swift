@@ -13,40 +13,52 @@ class ViewController: UIViewController {
 
     private var detailedImages: [DetailedImage] = []
 
+    private func getImageURL(_ number: Int) -> String {
+        "https://www.andyibanez.com/fairesepages.github.io/tutorials/async-await/part1/\(number).png"
+    }
+
+    private func getMetadataURL(_ number: Int) -> String {
+        "https://www.andyibanez.com/fairesepages.github.io/tutorials/async-await/part1/\(number).json"
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        downloadImageAndMetadata(imageNumber: 1) { [weak self] detailedImage, error in
-            guard let detailedImage = detailedImage else { return }
-            self?.detailedImages.append(detailedImage)
-            DispatchQueue.main.async { [weak self] in
-                self?.tableView.reloadData()
-            }
+        Task {
+            let imageDetail = try await downloadImageAndMetadata(imageNumber: 1)
+            detailedImages.append(imageDetail)
+            tableView.reloadData()
         }
     }
 
-    private func downloadImageAndMetadata(
-        imageNumber: Int,
-        completionHandler: @escaping (DetailedImage?, Error?) -> Void
-    ) {
-        let imageUrl = URL(string: "https://www.andyibanez.com/fairesepages.github.io/tutorials/async-await/part1/\(imageNumber).png")!
-        let imageTask = URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-            guard let data = data, let image = UIImage(data: data), (response as? HTTPURLResponse)?.statusCode == 200 else {
-                completionHandler(nil, ImageDownloadError.badImage)
-                return
-            }
-            let metadataUrl = URL(string: "https://www.andyibanez.com/fairesepages.github.io/tutorials/async-await/part1/\(imageNumber).json")!
-            let metadataTask = URLSession.shared.dataTask(with: metadataUrl) { data, response, error in
-                guard let data = data, let metadata = try? JSONDecoder().decode(ImageMetadata.self, from: data),  (response as? HTTPURLResponse)?.statusCode == 200 else {
-                    completionHandler(nil, ImageDownloadError.invalidMetadata)
-                    return
-                }
-                let detailedImage = DetailedImage(image: image, metadata: metadata)
-                completionHandler(detailedImage, nil)
-            }
-            metadataTask.resume()
+    func downloadImageAndMetadata(imageNumber: Int) async throws -> DetailedImage {
+        print("Will download image")
+        let image = try await downloadImage(imageNumber: imageNumber)
+        print("Has downloaded image")
+        print("Will download metadata")
+        let metadata = try await downloadMetadata(for: imageNumber)
+        print("Has downloaded metadata")
+        return DetailedImage(image: image, metadata: metadata)
+    }
+
+    private func downloadImage(imageNumber: Int) async throws -> UIImage {
+        let url = URL(string: getImageURL(imageNumber))!
+        let request = URLRequest(url: url)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let image = UIImage(data: data), (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw ImageDownloadError.badImage
         }
-        imageTask.resume()
+        return image
+    }
+
+    func downloadMetadata(for id: Int) async throws -> ImageMetadata {
+        let url = URL(string: getMetadataURL(id))!
+        let request = URLRequest(url: url)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw ImageDownloadError.invalidMetadata
+        }
+        return try JSONDecoder().decode(ImageMetadata.self, from: data)
     }
 }
 
