@@ -25,23 +25,35 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         Task {
-            let imageDetail = try await downloadImageAndMetadata(imageNumber: 1)
-            detailedImages.append(imageDetail)
-            tableView.reloadData()
+            do {
+                let imageDetails = try await downloadMultipleImagesWithMetadata(images: 1,1,1,1,1,1,1,1)
+                detailedImages = imageDetails
+                tableView.reloadData()
+            }
+            catch {
+                print("---> \(error)")
+            }
         }
     }
 
+    // NEW FUNCTION
+    func downloadMultipleImagesWithMetadata(images: Int...) async throws -> [DetailedImage]{
+        var imagesMetadata: [DetailedImage] = []
+        for image in images {
+            async let result = downloadImageAndMetadata(imageNumber: image)
+            imagesMetadata += [try await result]
+        }
+        return imagesMetadata
+    }
+
     func downloadImageAndMetadata(imageNumber: Int) async throws -> DetailedImage {
-        print("Will download image")
-        let image = try await downloadImage(imageNumber: imageNumber)
-        print("Has downloaded image")
-        print("Will download metadata")
-        let metadata = try await downloadMetadata(for: imageNumber)
-        print("Has downloaded metadata")
-        return DetailedImage(image: image, metadata: metadata)
+        async let image = downloadImage(imageNumber: imageNumber)
+        async let metadata = downloadMetadata(for: imageNumber)
+        return try DetailedImage(image: await image, metadata: await metadata)
     }
 
     private func downloadImage(imageNumber: Int) async throws -> UIImage {
+        try Task.checkCancellation()
         let url = URL(string: getImageURL(imageNumber))!
         let request = URLRequest(url: url)
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -52,6 +64,7 @@ class ViewController: UIViewController {
     }
 
     func downloadMetadata(for id: Int) async throws -> ImageMetadata {
+        try Task.checkCancellation()
         let url = URL(string: getMetadataURL(id))!
         let request = URLRequest(url: url)
         let (data, response) = try await URLSession.shared.data(for: request)
