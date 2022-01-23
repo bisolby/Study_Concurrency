@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     private var detailedImages: [DetailedImage] = []
 
     private func getImageURL(_ number: Int) -> String {
-        "https://www.andyibanez.com/fairesepages.github.io/tutorials/async-await/part1/\(number).png"
+        "https://cdn.clien.net/web/api/file/F01/10857985/177492a4904601.jpg"
     }
 
     private func getMetadataURL(_ number: Int) -> String {
@@ -26,31 +26,35 @@ class ViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         Task {
             do {
-                let imageDetails = try await downloadMultipleImagesWithMetadata(images: 1,1,1,1,1,1,1,1)
-                detailedImages = imageDetails
+                let imageDetail = try await downloadImageAndMetadata(imageNumber: 1)
+                detailedImages = [imageDetail]
                 tableView.reloadData()
             }
             catch {
-                print("---> \(error)")
+                print("")
             }
         }
     }
 
-    // NEW FUNCTION
-    func downloadMultipleImagesWithMetadata(images: Int...) async throws -> [DetailedImage]{
-        var imagesMetadata: [DetailedImage] = []
-        for image in images {
-            async let result = downloadImageAndMetadata(imageNumber: image)
-            imagesMetadata += [try await result]
-        }
-        return imagesMetadata
+    func downloadImageAndMetadata(imageNumber: Int) async throws -> DetailedImage {
+        print("---> willImageDownload")
+        let image = try await downloadImage(imageNumber: imageNumber)
+        print("---> didImageDownload")
+        print("---> willMetadataDownload")
+        let metadata = try await downloadMetadata(for: imageNumber)
+        print("---> didMetadataDownload")
+        return DetailedImage(image: image, metadata: metadata)
     }
 
-    func downloadImageAndMetadata(imageNumber: Int) async throws -> DetailedImage {
-        async let image = downloadImage(imageNumber: imageNumber)
-        async let metadata = downloadMetadata(for: imageNumber)
-        return try DetailedImage(image: await image, metadata: await metadata)
-    }
+//    func downloadImageAndMetadata(imageNumber: Int) async throws -> DetailedImage {
+//        print("---> willImageDownload")
+//        async let image = downloadImage(imageNumber: imageNumber)
+//        print("---> didImageDownload")
+//        print("---> willMetadataDownload")
+//        async let metadata = downloadMetadata(for: imageNumber)
+//        print("---> didMetadataDownload")
+//        return try DetailedImage(image: await image, metadata: await metadata)
+//    }
 
     private func downloadImage(imageNumber: Int) async throws -> UIImage {
         try Task.checkCancellation()
